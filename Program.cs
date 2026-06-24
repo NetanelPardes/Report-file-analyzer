@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace program;
 
@@ -115,6 +116,86 @@ class program
         }
         return sum / numberOfValid;
     }
+    static double FindMaxScore(double[] scores, int numberOfValid)
+    {
+        double myMax = scores[0];
+        for(int i = 0; i < numberOfValid;i++)
+        {
+            if (scores[i] > myMax)
+            {
+                myMax = scores[i];
+            }
+        }
+        return myMax;
+    }
+    static double FindMinScore(double[] scores, int numberOfValid)
+    {
+        double myMin = scores[0];
+        for (int i = 0; i < numberOfValid; i++)
+        {
+            if (scores[i] < myMin)
+            {
+                myMin = scores[i];
+            }
+        }
+        return myMin;
+    }
+    static int CountByStatus(string[] my_status, string status, int Valid)
+    {
+        int statusCount = 0;
+        for (int i = 0; i < Valid; i++)
+        {
+            if (my_status[i].ToLower() == status.ToLower())
+            {
+                statusCount++;
+            }
+        }
+        return statusCount;
+    }
+    static int CountByType(string[] my_type, string type, int Valid)
+    {
+        int typeCount = 0;
+        for (int i = 0; i < Valid; i++)
+        {
+            if (my_type[i].ToLower() == type.ToLower())
+            {
+                typeCount++;
+            }
+        }
+        return typeCount;
+    }
+    static void DisplayBasicStatistics(double[] scores , int Valid)
+    {
+        double avg = CalculateAverage(scores, Valid);
+        double my_max = FindMaxScore(scores, Valid);
+        double my_min = FindMinScore(scores, Valid);
+        Console.WriteLine("===report satistic==");
+        Console.WriteLine($"the count of reports is {Valid}");
+        Console.WriteLine($"the score average is {avg}");
+        Console.WriteLine($"the max score is {my_max}");
+        Console.WriteLine($"the min score is {my_min}");
+
+    }
+    static void DisplayStatusCounts(string[] status , int Valid)
+    {
+        int myRejected = CountByStatus(status, "Rejected", Valid);
+        Console.WriteLine($"the count of status Rejected is {myRejected}");
+        int myApproved = CountByStatus(status, "Approved", Valid);
+        Console.WriteLine($"the count of status Approved is {myApproved}");
+        int myPending = CountByStatus(status, "Pending", Valid);
+        Console.WriteLine($"the count of status Pending is {myPending}");
+    }
+    static void DisplayTypeCounts(string[] Types, int Valid)
+    {
+        int myCollect = CountByType(Types, "Collect", Valid);
+        Console.WriteLine($"the count of type Collect is {myCollect}");
+        int myAnalyze = CountByType(Types, "Analyze", Valid);
+        Console.WriteLine($"the count of type Analyze is {myAnalyze}");
+        int myRecon = CountByType(Types, "Recon", Valid);
+        Console.WriteLine($"the count of type Recon is {myRecon}");
+        int myIntel = CountByType(Types, "Intel", Valid);
+        Console.WriteLine($"the count of type Intel is {myIntel}");
+    }
     static void Main()
     {
         string path = @"..\..\..\reports.txt";
@@ -133,13 +214,16 @@ class program
 
             NumberValidLines = ProcessReports(myRepors, Units, Types, Prioritys, Scores, Statuss, ref NumberValidLines, ref NumberInvalidLines);
             Console.WriteLine($"Stored {NumberValidLines} valid records for analysis");
-            double avg = CalculateAverage(Scores, NumberValidLines);
-            Console.WriteLine(avg);
+            DisplayBasicStatistics(Scores, NumberValidLines);
+            DisplayStatusCounts(Statuss, NumberValidLines);
+            DisplayTypeCounts(Types, NumberValidLines);
             
+
+
         }
         
 
-
+        
         //foreach(string t in myRepors)
         //{
         //    Console.WriteLine(t);
