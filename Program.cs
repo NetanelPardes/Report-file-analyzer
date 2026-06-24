@@ -114,7 +114,7 @@ class program
         {
             sum += scores[i];
         }
-        return sum / numberOfValid;
+        return (sum / numberOfValid);
     }
     static double FindMaxScore(double[] scores, int numberOfValid)
     {
@@ -171,7 +171,7 @@ class program
         double my_min = FindMinScore(scores, Valid);
         Console.WriteLine("===report satistic==");
         Console.WriteLine($"the count of reports is {Valid}");
-        Console.WriteLine($"the score average is {avg}");
+        Console.WriteLine($"the score average is {avg.ToString("F2")}");
         Console.WriteLine($"the max score is {my_max}");
         Console.WriteLine($"the min score is {my_min}");
 
@@ -221,17 +221,5 @@ class program
 
 
         }
-        
-
-        
-        //foreach(string t in myRepors)
-        //{
-        //    Console.WriteLine(t);
-        //}
-        if (myRepors.Count > 0)
-        {
-            Console.WriteLine($"File loaded: {myRepors.Count} lines found");
-        }
-        //ProcessLine("Alpha, Collect,3.87,5,Approved");
     }
 }
