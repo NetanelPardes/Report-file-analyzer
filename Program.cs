@@ -83,7 +83,7 @@ class program
         return true;
         
     }
-    static int ProcessReports(List<string> my_lines, string[] Units , string[] Types, int[] Prioritys, double[] Scores, string[] Statuss ,ref int NumberValidLines, ref int NumberInvalidLines)
+    static int ProcessReports(List<string> my_lines, string[] Units , ReportType[] Types, int[] Prioritys, double[] Scores, ReportStatus[] Statuss ,ref int NumberValidLines, ref int NumberInvalidLines)
     {
         foreach (string line in my_lines)
         {
@@ -91,12 +91,14 @@ class program
             if(CountLine(my_line) && Verification(my_line))
             {
                 Units[NumberValidLines] = my_line[0];
-                Types[NumberValidLines] = my_line[1];
+                ReportType.TryParse(my_line[1], true, out ReportType repotype);
+                Types[NumberValidLines] = repotype;
                 int.TryParse(my_line[2], out int pra);
                 Prioritys[NumberValidLines] = pra;
                 double.TryParse(my_line[3], out double sco);
                 Scores[NumberValidLines] = sco;
-                Statuss[NumberValidLines] = my_line[4];
+                ReportType.TryParse(my_line[4], true, out ReportStatus repostatus);
+                Statuss[NumberValidLines] = repostatus;
                 NumberValidLines++;
             }
             else
@@ -140,24 +142,24 @@ class program
         }
         return myMin;
     }
-    static int CountByStatus(string[] my_status, string status, int Valid)
+    static int CountByStatus(ReportStatus[] my_status, string status, int Valid)
     {
         int statusCount = 0;
         for (int i = 0; i < Valid; i++)
         {
-            if (my_status[i].ToLower() == status.ToLower())
+            if (my_status[i].ToString().ToLower() == status.ToLower())
             {
                 statusCount++;
             }
         }
         return statusCount;
     }
-    static int CountByType(string[] my_type, string type, int Valid)
+    static int CountByType(ReportType[] my_type, string type, int Valid)
     {
         int typeCount = 0;
         for (int i = 0; i < Valid; i++)
         {
-            if (my_type[i].ToLower() == type.ToLower())
+            if (my_type[i].ToString().ToLower() == type.ToLower())
             {
                 typeCount++;
             }
@@ -176,7 +178,7 @@ class program
         Console.WriteLine($"the min score is {my_min}");
 
     }
-    static void DisplayStatusCounts(string[] status , int Valid)
+    static void DisplayStatusCounts(ReportStatus[] status , int Valid)
     {
         int myRejected = CountByStatus(status, "Rejected", Valid);
         Console.WriteLine($"the count of status Rejected is {myRejected}");
@@ -185,7 +187,7 @@ class program
         int myPending = CountByStatus(status, "Pending", Valid);
         Console.WriteLine($"the count of status Pending is {myPending}");
     }
-    static void DisplayTypeCounts(string[] Types, int Valid)
+    static void DisplayTypeCounts(ReportType[] Types, int Valid)
     {
         int myCollect = CountByType(Types, "Collect", Valid);
         Console.WriteLine($"the count of type Collect is {myCollect}");
@@ -207,10 +209,10 @@ class program
             int NumberInvalidLines = 0;
 
             string[] Units = new string[100];
-            string[] Types = new string[100];
+            ReportType[] Types = new ReportType[100];
             int[] Prioritys = new int[100];
             double[] Scores = new double[100];
-            string[] Statuss = new string[100];
+            ReportStatus[] Statuss = new ReportStatus[100];
 
             NumberValidLines = ProcessReports(myRepors, Units, Types, Prioritys, Scores, Statuss, ref NumberValidLines, ref NumberInvalidLines);
             Console.WriteLine($"Stored {NumberValidLines} valid records for analysis");
