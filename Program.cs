@@ -2,12 +2,10 @@
 using System.Globalization;
 using System.IO;
 using static System.Formats.Asn1.AsnWriter;
-
 namespace program;
-
 enum ReportType{ Collect, Analyze, Recon, Intel }
 enum ReportStatus{ Rejected, Approved, Pending }
-class program
+class MyProgram
 {
     static List<string> LoadFile(string myPath)
     {
@@ -45,6 +43,11 @@ class program
     }
     static bool Verification(String[] myLine)
     {
+        if (myLine[0] == "")
+        {
+            Console.WriteLine("reason:The unit must not be empty.");
+            return false;
+        }
         int priority;
         if(!int.TryParse(myLine[2],out priority) )
         {
@@ -81,7 +84,6 @@ class program
         }
         Console.WriteLine("Valid record processed");
         return true;
-        
     }
     static int ProcessReports(List<string> my_lines, string[] Units , ReportType[] Types, int[] Prioritys, double[] Scores, ReportStatus[] Statuss ,ref int NumberValidLines, ref int NumberInvalidLines)
     {
@@ -105,7 +107,6 @@ class program
             {
                 NumberInvalidLines++;
             }
-            
         }
         return NumberValidLines;
     }
@@ -176,7 +177,6 @@ class program
         Console.WriteLine($"the score average is {avg.ToString("F2")}");
         Console.WriteLine($"the max score is {my_max}");
         Console.WriteLine($"the min score is {my_min}\n");
-
     }
     static void DisplayStatusCounts(ReportStatus[] status , int Valid)
     {
@@ -203,7 +203,7 @@ class program
     static void DisplayHighestPriorityApproved(string[] Units, ReportType[] Types, int[] Prioritys, double[] Scores, ReportStatus[] Statuss, int Valid)
     {
         int maxi = Prioritys[0];
-        int index = 0;
+        int index = -1;
         for (int i = 0; i < Valid; i++)
         {
             if (Statuss[i] == ReportStatus.Approved && Prioritys[i] > maxi)
@@ -211,6 +211,11 @@ class program
                 maxi = Prioritys[i];
                 index = i;
             }
+        }
+        if(index == -1)
+        {
+            Console.WriteLine("No approved reports found");
+            return;
         }
         Console.WriteLine("=== Highest Priority Approved Report ===");
         Console.WriteLine($"Unit: {Units[index]}");
@@ -240,17 +245,16 @@ class program
         string path = @"..\..\..\reports.txt";
         List<string> myRepors = LoadFile(path);
         int count_line = myRepors.Count;
+        Console.WriteLine($"File loaded: {count_line} lines found\n");
         if(count_line > 0)
         {
             int NumberValidLines = 0;
             int NumberInvalidLines = 0;
-
             string[] Units = new string[100];
             ReportType[] Types = new ReportType[100];
             int[] Prioritys = new int[100];
             double[] Scores = new double[100];
             ReportStatus[] Statuss = new ReportStatus[100];
-
             NumberValidLines = ProcessReports(myRepors, Units, Types, Prioritys, Scores, Statuss, ref NumberValidLines, ref NumberInvalidLines);
             Console.WriteLine($"Stored {NumberValidLines} valid records for analysis\n");
             DisplayBasicStatistics(Scores, NumberValidLines);
@@ -259,8 +263,9 @@ class program
             DisplayHighestPriorityApproved(Units, Types, Prioritys, Scores, Statuss, NumberValidLines);
             DisplayAverageByPriority(Prioritys, Scores, NumberValidLines);
 
-
-
+            Console.WriteLine("Processing complete");
+            Console.WriteLine($"Valid records: {NumberValidLines}");
+            Console.WriteLine($"Invalid records: {NumberInvalidLines}");
         }
     }
 }
