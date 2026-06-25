@@ -175,20 +175,22 @@ class program
         Console.WriteLine($"the count of reports is {Valid}");
         Console.WriteLine($"the score average is {avg.ToString("F2")}");
         Console.WriteLine($"the max score is {my_max}");
-        Console.WriteLine($"the min score is {my_min}");
+        Console.WriteLine($"the min score is {my_min}\n");
 
     }
     static void DisplayStatusCounts(ReportStatus[] status , int Valid)
     {
+        Console.WriteLine("=== Reports by Status ===");
         int myRejected = CountByStatus(status, "Rejected", Valid);
         Console.WriteLine($"the count of status Rejected is {myRejected}");
         int myApproved = CountByStatus(status, "Approved", Valid);
         Console.WriteLine($"the count of status Approved is {myApproved}");
         int myPending = CountByStatus(status, "Pending", Valid);
-        Console.WriteLine($"the count of status Pending is {myPending}");
+        Console.WriteLine($"the count of status Pending is {myPending}\n");
     }
     static void DisplayTypeCounts(ReportType[] Types, int Valid)
     {
+        Console.WriteLine("=== Reports by Type ===");
         int myCollect = CountByType(Types, "Collect", Valid);
         Console.WriteLine($"the count of type Collect is {myCollect}");
         int myAnalyze = CountByType(Types, "Analyze", Valid);
@@ -196,7 +198,42 @@ class program
         int myRecon = CountByType(Types, "Recon", Valid);
         Console.WriteLine($"the count of type Recon is {myRecon}");
         int myIntel = CountByType(Types, "Intel", Valid);
-        Console.WriteLine($"the count of type Intel is {myIntel}");
+        Console.WriteLine($"the count of type Intel is {myIntel}\n");
+    }
+    static void DisplayHighestPriorityApproved(string[] Units, ReportType[] Types, int[] Prioritys, double[] Scores, ReportStatus[] Statuss, int Valid)
+    {
+        int maxi = Prioritys[0];
+        int index = 0;
+        for (int i = 0; i < Valid; i++)
+        {
+            if (Statuss[i] == ReportStatus.Approved && Prioritys[i] > maxi)
+            {
+                maxi = Prioritys[i];
+                index = i;
+            }
+        }
+        Console.WriteLine("=== Highest Priority Approved Report ===");
+        Console.WriteLine($"Unit: {Units[index]}");
+        Console.WriteLine($"Type: {Types[index]}");
+        Console.WriteLine($"Priority: {Prioritys[index]}");
+        Console.WriteLine($"Score: {Scores[index]}\n");
+    }
+    static void DisplayAverageByPriority(int[] Prioritys, double[] Scores, int Valid)
+    {
+        int[] countP = new int[6];
+        double[] sumP = new double[6];
+        for (int i = 0; i < Valid; i++)
+        {
+            int p = Prioritys[i];
+            countP[p] += 1;
+            sumP[p] += Scores[i];
+        }
+        Console.WriteLine("=== Average Score by Priority ===");
+        for (int i = 1; i < 6; i++)
+        {
+            Console.WriteLine($"Priority {i} : {(countP[i] != 0 ? (sumP[i] / countP[i]).ToString("F2") : "No reports")}");
+        }
+        Console.WriteLine("\n");
     }
     static void Main()
     {
@@ -215,11 +252,13 @@ class program
             ReportStatus[] Statuss = new ReportStatus[100];
 
             NumberValidLines = ProcessReports(myRepors, Units, Types, Prioritys, Scores, Statuss, ref NumberValidLines, ref NumberInvalidLines);
-            Console.WriteLine($"Stored {NumberValidLines} valid records for analysis");
+            Console.WriteLine($"Stored {NumberValidLines} valid records for analysis\n");
             DisplayBasicStatistics(Scores, NumberValidLines);
             DisplayStatusCounts(Statuss, NumberValidLines);
             DisplayTypeCounts(Types, NumberValidLines);
-            
+            DisplayHighestPriorityApproved(Units, Types, Prioritys, Scores, Statuss, NumberValidLines);
+            DisplayAverageByPriority(Prioritys, Scores, NumberValidLines);
+
 
 
         }
